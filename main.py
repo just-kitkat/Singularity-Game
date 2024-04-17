@@ -31,6 +31,9 @@ def update(dt, player):
             pygame.quit()
             sys.exit()
 
+    # Gravitate player towards blackhole
+    player.float([])
+
             
  
 
