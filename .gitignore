@@ -1,2 +1,6 @@
 **/__pycache__/
 *.pyc
+.replit
+replit.nix
+poetry.lock
+pyproject.toml

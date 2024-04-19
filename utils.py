@@ -2,7 +2,7 @@ from typing import List
 import pygame
 
 PLAYER_MOVEMENT_SHIFT = 2 # velocity of player
-INITIAL_GRAVITY = 3
+INITIAL_GRAVITY = 1
 
 
 class Player:
@@ -59,3 +59,22 @@ class Blackhole(Player):
     """
     def __init__(self, x: int, y: int, image: str) -> None:
         super().__init__(x, y, image)
+
+class Planet(Player):
+    """
+    Planet should be a small circle with a predefined radius indicating the area of effect
+    """
+    def __init__(self, x: int, y: int, image: str, radius: int) -> None:
+        super().__init__(x, y, image)
+        self.image = pygame.transform.scale(self.image, (30, 30))
+        self.radius = radius
+
+    def draw(self, screen):
+        super().draw(screen)
+        # pygame.draw.circle(screen, (0, 255, 0), (self.x, self.y), self.radius)
+
+    def get_coords_and_radius(self):
+        """
+        Returns the coordinates (x, y) and radius of the planet.
+        """
+        return [self.x, self.y, self.radius]
