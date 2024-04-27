@@ -7,24 +7,37 @@ INITIAL_GRAVITY = 0.3
 SCREEN_WIDTH, SCREEN_HEIGHT = 1366, 697
 PLAYER_X, PLAYER_Y = SCREEN_WIDTH / 2, 50
 BLACKHOLE_X, BLACKHOLE_Y = SCREEN_WIDTH / 2, SCREEN_HEIGHT + 20
-FPS = 60.0
+FPS = 30
 
 # Assets
-IDLE = background = pygame.image.load("assets/idle.png")
-FLY_UP = background = pygame.image.load("assets/fly_up.png")
-FLY_LEFT = background = pygame.image.load("assets/fly_left.png")
-FLY_RIGHT = background = pygame.image.load("assets/fly_right.png")
-ASTEROID = background = pygame.image.load("assets/asteroid.png")
+BACKGROUND_IMAGE = "background.jpg"
+IDLE = "assets/idle.png"
+FLY_UP = "assets/fly_up.png"
+FLY_LEFT = "assets/fly_left.png"
+FLY_RIGHT = "assets/fly_right.png"
+ASTEROID = "assets/asteroid.png"
 
 
 class Player:
     def __init__(self, x: int, y: int, image: str) -> None:
         self.x = x
         self.y = y
-        self.image = pygame.image.load(image)
-        self.image = pygame.transform.scale(self.image, (30, 50))
+        self.state = "idle"
+        self.player_action = False
+        # Load assets
+        states = {
+            "idle": pygame.image.load(IDLE),
+            "fly_up": pygame.image.load(FLY_UP),
+            "fly_left": pygame.image.load(FLY_LEFT),
+            "fly_right": pygame.image.load(FLY_RIGHT),
+        }
+        n = 6.5 # scale factor for astronaut
+        for state in states:
+            states[state] = pygame.transform.scale(states[state], (states[state].get_width()/n, states[state].get_height()/n))
+        self.image = states["idle"]
         self.image_rect = self.image.get_rect()
         self.gravity = INITIAL_GRAVITY
+        self.states = states
 
     def move(self, dir: str) -> None:
         """
@@ -32,10 +45,15 @@ class Player:
         """
         if dir == "left":
             self.x -= PLAYER_MOVEMENT_SHIFT
+            self.state = "fly_left"
+            self.player_action = True
         elif dir == "right":
             self.x += PLAYER_MOVEMENT_SHIFT
+            self.state = "fly_right"
+            self.player_action = True
         else:
-            raise ValueError(f"Invalid direction: {dir}")
+            self.state = "idle"
+            self.player_action = False
         
 
     def float(self, planets: List[List[int]], blackhole) -> None:
@@ -50,7 +68,7 @@ class Player:
             x, y, radius = planet
             if (abs(self.x - x)**2 + abs(self.y - y)**2)**0.5 < radius:
                 nearest_planet = planet
-        print(nearest_planet)
+        
         if nearest_planet is not None: # Planet exists
             p_X, _, _ = nearest_planet
 
@@ -66,17 +84,19 @@ class Player:
         # If player is able to move down (no planet or planet below)
         if nearest_planet is None:
             self.y += self.gravity
+            self.state = "idle"
         elif nearest_planet[1] > self.y:
-            self.y += abs(self.y - nearest_planet[1]) / abs(self.x - p_X)
+            self.y += abs(self.y - nearest_planet[1]) // abs(self.x - p_X)
         elif self.x - p_X != 0: # check for division by 0
             # Move upwards to the planet slowly (proportional to dist from planet)
-            self.y -= abs(self.y - nearest_planet[1]) / abs(self.x - p_X)
+            self.y -= abs(self.y - nearest_planet[1]) // abs(self.x - p_X)
 
     
     def draw(self, screen):
         """
         Draws the player onto the screen
         """
+        self.image = self.states[self.state]
         self.image_rect.x, self.image_rect.y = self.x, self.y
         screen.blit(self.image, self.image_rect)
 
@@ -96,7 +116,10 @@ class Planet(Player):
     """
     def __init__(self, x: int, y: int, image: str, radius: int) -> None:
         super().__init__(x, y, image)
-        self.image = pygame.transform.scale(self.image, (30, 30))
+        self.state = "planet"
+        self.states = {"planet": pygame.image.load("circle.jpg")}
+        self.states["planet"] = pygame.transform.scale(self.states["planet"], (30, 30))
+        self.image = self.states["planet"]
         self.radius = radius
 
     def draw(self, screen):

@@ -1,10 +1,7 @@
 import pygame
 import random
-from utils import Planet
+from utils import BACKGROUND_IMAGE, SCREEN_WIDTH, SCREEN_HEIGHT, Planet
 
-# Constants
-SCREEN_WIDTH, SCREEN_HEIGHT = 1366, 679
-BACKGROUND_IMAGE = "background.jpg"
 
 def generate_random_map(num_planets, min_radius, max_radius):
     """

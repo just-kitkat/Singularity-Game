@@ -4,7 +4,14 @@ import random
 from pygame.locals import *
 
 # Constants 
-from utils import SCREEN_WIDTH, SCREEN_HEIGHT, PLAYER_X, PLAYER_Y, BLACKHOLE_X, BLACKHOLE_Y,FPS
+from utils import (
+    SCREEN_WIDTH, SCREEN_HEIGHT, 
+    PLAYER_X, PLAYER_Y, 
+    BLACKHOLE_X, BLACKHOLE_Y,
+    FPS,
+    IDLE, FLY_UP, FLY_LEFT, FLY_RIGHT,
+    ASTEROID, BACKGROUND_IMAGE
+)
 # Classes
 from utils import Player, Blackhole
 
@@ -22,13 +29,15 @@ def update(dt, player, planets, blackhole_coords):
 
     and this will scale your velocity based on time. Extend as necessary.
     """
+    player.float(planets, blackhole_coords)
+
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:
         player.move("left")
     elif keys[pygame.K_RIGHT]:
         player.move("right")
-
-    player.float(planets, blackhole_coords)
+    else:
+        player.move("idle")
 
     # Handle events
     for event in pygame.event.get():
@@ -61,11 +70,41 @@ def main():
     # index 0 is list of objects, index 1 is list of coordinates
 
     # Set up game objects
-    player = Player(PLAYER_X, PLAYER_Y, image="test_player.png")
+    player = Player(PLAYER_X, PLAYER_Y, image=IDLE)
     objects = generated_planets[0] + [player]
 
     # Game loop
     dt = 1 / FPS
+
+    # Home screen
+    font = pygame.font.Font("assets/font.ttf", 45)
+    screen.blit(
+        pygame.image.load(BACKGROUND_IMAGE).convert(),
+        (0, 0)
+    )
+    screen.blit(
+        font.render('SINGULARITY', True, (255, 255, 255)), 
+        (SCREEN_WIDTH / 2.8, SCREEN_HEIGHT / 3)
+    )
+    screen.blit(
+        font.render('PRESS ANY KEY TO START', True, (255, 255, 255)), 
+        (SCREEN_WIDTH / 3.75, SCREEN_HEIGHT / 2)
+    )
+    pygame.display.flip()
+
+    while True:
+        # print(list(pygame.key.get_pressed()))
+        flag = 0
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                flag = 1
+            elif event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+        if flag: break
+        dt = clock.tick(FPS)
+
+    # Main game
     while True:
         update(dt, player, generated_planets, blackhole_coords)
         draw(screen, background, objects)
