@@ -1,8 +1,20 @@
 from typing import List
 import pygame
 
+# Constants
 PLAYER_MOVEMENT_SHIFT = 2 # velocity of player
 INITIAL_GRAVITY = 0.3
+SCREEN_WIDTH, SCREEN_HEIGHT = 1366, 697
+PLAYER_X, PLAYER_Y = SCREEN_WIDTH / 2, 50
+BLACKHOLE_X, BLACKHOLE_Y = SCREEN_WIDTH / 2, SCREEN_HEIGHT + 20
+FPS = 60.0
+
+# Assets
+IDLE = background = pygame.image.load("assets/idle.png")
+FLY_UP = background = pygame.image.load("assets/fly_up.png")
+FLY_LEFT = background = pygame.image.load("assets/fly_left.png")
+FLY_RIGHT = background = pygame.image.load("assets/fly_right.png")
+ASTEROID = background = pygame.image.load("assets/asteroid.png")
 
 
 class Player:
@@ -48,8 +60,8 @@ class Player:
 
         else:
             # Gravitate sideways towards the blackhole below
-            if blackhole.x > self.x: self.x += 0.5
-            elif blackhole.x < self.x: self.x -= 0.5
+            if blackhole.x > self.x: self.x += abs(self.x - BLACKHOLE_X) / abs(self.y - BLACKHOLE_Y)
+            elif blackhole.x < self.x: self.x -= abs(self.x - BLACKHOLE_X) / abs(self.y - BLACKHOLE_Y)
 
         # If player is able to move down (no planet or planet below)
         if nearest_planet is None:

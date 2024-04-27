@@ -2,13 +2,14 @@ import sys
 import pygame
 import random
 from pygame.locals import *
+
+# Constants 
+from utils import SCREEN_WIDTH, SCREEN_HEIGHT, PLAYER_X, PLAYER_Y, BLACKHOLE_X, BLACKHOLE_Y,FPS
+# Classes
 from utils import Player, Blackhole
+
 from map import generate_random_map
 
-# Constants
-SCREEN_WIDTH, SCREEN_HEIGHT = 1366, 697
-PLAYER_X, PLAYER_Y = SCREEN_WIDTH / 2, 50
-FPS = 60.0
 
 def update(dt, player, planets, blackhole_coords):
     """
@@ -56,7 +57,7 @@ def main():
     num_planets = random.randint(8, 10)  # Random number of planets
     min_radius, max_radius = 80, 150  # Define min and max radius for planets
     generated_planets = generate_random_map(num_planets, min_radius, max_radius)
-    blackhole_coords = Blackhole(SCREEN_WIDTH / 2, SCREEN_HEIGHT + 20, image="circle.jpg") # Blackhole should be slightly below the visible screen
+    blackhole_coords = Blackhole(BLACKHOLE_X, BLACKHOLE_Y, image="circle.jpg") # Blackhole should be slightly below the visible screen
     # index 0 is list of objects, index 1 is list of coordinates
 
     # Set up game objects
