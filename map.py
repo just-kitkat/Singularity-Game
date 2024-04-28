@@ -39,7 +39,7 @@ def generate_random_map(num_planets, min_radius, max_radius):
 
     # Generate random map
     planets = create_planets()
-
+    print()
     return planets
 
 if __name__ == "__main__":

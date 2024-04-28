@@ -38,6 +38,7 @@ class Player:
         self.image_rect = self.image.get_rect()
         self.gravity = INITIAL_GRAVITY
         self.states = states
+        self.game_state = "playing"
 
     def move(self, dir: str) -> None:
         """
@@ -56,7 +57,7 @@ class Player:
             self.player_action = False
         
 
-    def float(self, planets: List[List[int]], blackhole) -> None:
+    def float(self, planets: List[List[int]], blackhole, planets_rect) -> None:
         """
         Handles normal player movement
         planets -- [[x, y, radius], ...]
@@ -71,6 +72,12 @@ class Player:
         
         if nearest_planet is not None: # Planet exists
             p_X, _, _ = nearest_planet
+
+            # Check for collision
+            for planet_rect in planets_rect:
+                if self.image_rect.colliderect(planet_rect):
+                    self.game_state = "lost"
+                    return
 
             # Move toward the planet (x-axis)
             if p_X > self.x: self.x += 0.5
@@ -120,6 +127,7 @@ class Planet(Player):
         self.states = {"planet": pygame.image.load("circle.jpg")}
         self.states["planet"] = pygame.transform.scale(self.states["planet"], (30, 30))
         self.image = self.states["planet"]
+        self.image_rect = self.image.get_rect()
         self.radius = radius
 
     def draw(self, screen):

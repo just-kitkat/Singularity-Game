@@ -18,7 +18,7 @@ from utils import Player, Blackhole
 from map import generate_random_map
 
 
-def update(dt, player, planets, blackhole_coords):
+def update(dt, player, planets, blackhole_coords, planets_rect):
     """
     Update game. Called once per frame.
     dt is the amount of time passed since last frame.
@@ -29,7 +29,7 @@ def update(dt, player, planets, blackhole_coords):
 
     and this will scale your velocity based on time. Extend as necessary.
     """
-    player.float(planets, blackhole_coords)
+    player.float(planets, blackhole_coords, planets_rect)
 
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:
@@ -38,6 +38,9 @@ def update(dt, player, planets, blackhole_coords):
         player.move("right")
     else:
         player.move("idle")
+
+    if player.game_state == "lost":
+        return False
 
     # Handle events
     for event in pygame.event.get():
@@ -55,61 +58,92 @@ def draw(screen, background, objects):
 
 def main():
     pygame.init()
-    clock = pygame.time.Clock()
-
-    # Set up the window
-    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-
-    # Load images
-    background = pygame.image.load("background.jpg").convert()
-
-    num_planets = random.randint(8, 10)  # Random number of planets
-    min_radius, max_radius = 80, 150  # Define min and max radius for planets
-    generated_planets = generate_random_map(num_planets, min_radius, max_radius)
-    blackhole_coords = Blackhole(BLACKHOLE_X, BLACKHOLE_Y, image="circle.jpg") # Blackhole should be slightly below the visible screen
-    # index 0 is list of objects, index 1 is list of coordinates
-
-    # Set up game objects
-    player = Player(PLAYER_X, PLAYER_Y, image=IDLE)
-    objects = generated_planets[0] + [player]
-
-    # Game loop
-    dt = 1 / FPS
-
-    # Home screen
-    font = pygame.font.Font("assets/font.ttf", 45)
-    screen.blit(
-        pygame.image.load(BACKGROUND_IMAGE).convert(),
-        (0, 0)
-    )
-    screen.blit(
-        font.render('SINGULARITY', True, (255, 255, 255)), 
-        (SCREEN_WIDTH / 2.8, SCREEN_HEIGHT / 3)
-    )
-    screen.blit(
-        font.render('PRESS ANY KEY TO START', True, (255, 255, 255)), 
-        (SCREEN_WIDTH / 3.75, SCREEN_HEIGHT / 2)
-    )
-    pygame.display.flip()
 
     while True:
-        # print(list(pygame.key.get_pressed()))
-        flag = 0
-        for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN:
-                flag = 1
-            elif event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-        if flag: break
-        dt = clock.tick(FPS)
+        clock = pygame.time.Clock()
 
-    # Main game
-    while True:
-        update(dt, player, generated_planets, blackhole_coords)
-        draw(screen, background, objects)
+        # Set up the window
+        screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+
+        # Load images
+        background = pygame.image.load("background.jpg").convert()
+
+        num_planets = random.randint(8, 10)  # Random number of planets
+        min_radius, max_radius = 80, 150  # Define min and max radius for planets
+        generated_planets = generate_random_map(num_planets, min_radius, max_radius)
+        blackhole_coords = Blackhole(BLACKHOLE_X, BLACKHOLE_Y, image="circle.jpg") # Blackhole should be slightly below the visible screen
+        planets_rect = [planet.image_rect for planet in generated_planets[0]]
+        # index 0 is list of objects, index 1 is list of coordinates
+
+        # Set up game objects
+        player = Player(PLAYER_X, PLAYER_Y, image=IDLE)
+        objects = generated_planets[0] + [player]
+
+        # Game loop
+        dt = 1 / FPS
+
+        # Home screen
+        font = pygame.font.Font("assets/font.ttf", 45)
+        screen.blit(
+            pygame.image.load(BACKGROUND_IMAGE).convert(),
+            (0, 0)
+        )
+        screen.blit(
+            font.render('SINGULARITY', True, (255, 255, 255)), 
+            (SCREEN_WIDTH / 2.8, SCREEN_HEIGHT / 3)
+        )
+        screen.blit(
+            font.render('PRESS ANY KEY TO START', True, (255, 255, 255)), 
+            (SCREEN_WIDTH / 3.75, SCREEN_HEIGHT / 2)
+        )
         pygame.display.flip()
-        dt = clock.tick(FPS)
+
+        run_start_screen = True
+        while run_start_screen:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    run_start_screen = False
+                elif event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+
+            dt = clock.tick(FPS)
+
+        # Main game
+        while True:
+            game_state = update(dt, player, generated_planets, blackhole_coords, planets_rect)
+            if game_state is not None: #player wins or lost
+                break
+            draw(screen, background, objects)
+            pygame.display.flip()
+            dt = clock.tick(FPS)
+
+
+        if player.game_state == "lost":
+            screen.blit(
+                pygame.image.load(BACKGROUND_IMAGE).convert(),
+                (0, 0)
+            )
+            screen.blit(
+                font.render('YOU LOST...', True, (255, 255, 255)), 
+                (SCREEN_WIDTH / 2.8, SCREEN_HEIGHT / 3)
+            )
+            screen.blit(
+                font.render('PRESS ANY KEY TO GO BACK HOME', True, (255, 255, 255)), 
+                (SCREEN_WIDTH / 3.75, SCREEN_HEIGHT / 2)
+            )
+            pygame.display.flip()
+        
+        run_exit_screen = True
+        while run_exit_screen:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    run_exit_screen = False
+                elif event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+
+            dt = clock.tick(FPS)
 
 if __name__ == "__main__":
     main()
