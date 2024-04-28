@@ -40,6 +40,7 @@ class Player:
         self.states = states
         self.game_state = "playing"
 
+
     def move(self, dir: str) -> None:
         """
         When the user moves the player
@@ -89,7 +90,7 @@ class Player:
             elif blackhole.x < self.x: self.x -= abs(self.x - BLACKHOLE_X) / abs(self.y - BLACKHOLE_Y)
 
         # If player is able to move down (no planet or planet below)
-        self.gravity = max(0.4, INITIAL_GRAVITY * (abs(self.y - BLACKHOLE_Y) / BLACKHOLE_Y))
+        self.gravity = max(0.4, INITIAL_GRAVITY * (abs((abs(self.y - BLACKHOLE_Y)**2 + abs(self.x - BLACKHOLE_X)**2) ** 0.5) / BLACKHOLE_Y))
         if nearest_planet is None:
             self.y += self.gravity
             self.state = "idle"
