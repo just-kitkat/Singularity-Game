@@ -3,7 +3,7 @@ import pygame
 
 # Constants
 PLAYER_MOVEMENT_SHIFT = 2 # velocity of player
-INITIAL_GRAVITY = 0.3
+INITIAL_GRAVITY = 1.4
 SCREEN_WIDTH, SCREEN_HEIGHT = 1366, 697
 PLAYER_X, PLAYER_Y = SCREEN_WIDTH / 2, 50
 BLACKHOLE_X, BLACKHOLE_Y = SCREEN_WIDTH / 2, SCREEN_HEIGHT + 20
@@ -90,7 +90,7 @@ class Player:
 
         # If player is able to move down (no planet or planet below)
         if nearest_planet is None:
-            self.y += self.gravity
+            self.y += max(0.5, self.gravity * (abs(self.y - BLACKHOLE_Y) / BLACKHOLE_Y))
             self.state = "idle"
         elif nearest_planet[1] > self.y:
             self.y += abs(self.y - nearest_planet[1]) // abs(self.x - p_X)
