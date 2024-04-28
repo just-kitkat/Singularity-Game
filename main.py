@@ -87,7 +87,7 @@ def main():
         screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
         # Load images
-        background = pygame.image.load("background.jpg").convert()
+        background = pygame.image.load("assets/background.jpg").convert()
 
         num_planets = random.randint(8, 10)  # Random number of planets
         min_radius, max_radius = 80, 150  # Define min and max radius for planets
