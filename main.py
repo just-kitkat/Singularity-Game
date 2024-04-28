@@ -48,11 +48,23 @@ def update(dt, player, planets, blackhole_coords, planets_rect):
             pygame.quit()
             sys.exit()
 
-def draw(screen, background, objects):
+def draw(screen, player, background, objects):
     """
     Draw objects to the screen. Called once per frame.
     """
     screen.blit(background, (0, 0))  # Draw the background
+    font = pygame.font.SysFont("Comic Sans MS", 20)
+    screen.blit(
+            font.render(f'Speed {round(player.gravity, 2)}', True, (255, 255, 255)), 
+            (5, 5)
+        )
+    screen.blit(
+            font.render(f"""Distance from blackhole {
+round((abs(player.y - BLACKHOLE_Y)**2 + abs(player.x - BLACKHOLE_X)**2) ** 0.5 * 10, 2)
+}km""", True, (255, 255, 255)
+), 
+            (5, 40)
+        )
     for obj in objects:
         obj.draw(screen)
 
@@ -114,7 +126,7 @@ def main():
             game_state = update(dt, player, generated_planets, blackhole_coords, planets_rect)
             if game_state is not None: #player wins or lost
                 break
-            draw(screen, background, objects)
+            draw(screen, player, background, objects)
             pygame.display.flip()
             dt = clock.tick(FPS)
 

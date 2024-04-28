@@ -89,8 +89,9 @@ class Player:
             elif blackhole.x < self.x: self.x -= abs(self.x - BLACKHOLE_X) / abs(self.y - BLACKHOLE_Y)
 
         # If player is able to move down (no planet or planet below)
+        self.gravity = max(0.4, INITIAL_GRAVITY * (abs(self.y - BLACKHOLE_Y) / BLACKHOLE_Y))
         if nearest_planet is None:
-            self.y += max(0.5, self.gravity * (abs(self.y - BLACKHOLE_Y) / BLACKHOLE_Y))
+            self.y += self.gravity
             self.state = "idle"
         elif nearest_planet[1] > self.y:
             self.y += abs(self.y - nearest_planet[1]) // abs(self.x - p_X)
