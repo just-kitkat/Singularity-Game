@@ -6,11 +6,11 @@ PLAYER_MOVEMENT_SHIFT = 2 # velocity of player
 INITIAL_GRAVITY = 1.4
 SCREEN_WIDTH, SCREEN_HEIGHT = 1366, 697
 PLAYER_X, PLAYER_Y = SCREEN_WIDTH / 2, 50
-BLACKHOLE_X, BLACKHOLE_Y = SCREEN_WIDTH / 6, 550
+BLACKHOLE_X, BLACKHOLE_Y = SCREEN_WIDTH / 2, SCREEN_HEIGHT + 20
 FPS = 30
 
 # Assets
-BACKGROUND_IMAGE = "background.jpg"
+BACKGROUND_IMAGE = "assets/background.jpg"
 IDLE = "assets/player/idle.png"
 FLY_UP = "assets/player/fly_up.png"
 FLY_LEFT = "assets/player/fly_left.png"
@@ -71,6 +71,11 @@ class Player:
             if (abs(self.x - x)**2 + abs(self.y - y)**2)**0.5 < radius:
                 nearest_planet = planet
         
+        # Check if player has reached blackhole
+        if self.y > BLACKHOLE_Y//2 and self.image_rect.colliderect(blackhole.image_rect):
+            self.game_state = "won"
+            return
+
         if nearest_planet is not None: # Planet exists
             p_X, _, _ = nearest_planet
 
@@ -86,8 +91,8 @@ class Player:
 
         else:
             # Gravitate sideways towards the blackhole below
-            if blackhole.x > self.x: self.x += abs(self.x - BLACKHOLE_X) / max(0.01, abs(self.y - BLACKHOLE_Y))
-            elif blackhole.x < self.x: self.x -= abs(self.x - BLACKHOLE_X) / max(0.01, abs(self.y - BLACKHOLE_Y))
+            if BLACKHOLE_X > self.x: self.x += 1 * (abs(self.x - BLACKHOLE_X) / max(0.01, abs(self.y - BLACKHOLE_Y)))
+            elif BLACKHOLE_X < self.x: self.x -= 1 * (abs(self.x - BLACKHOLE_X) / max(0.01, abs(self.y - BLACKHOLE_Y)))
 
         # If player is able to move down (no planet or planet below)
         self.gravity = max(0.4, INITIAL_GRAVITY * (abs((abs(self.y - BLACKHOLE_Y)**2 + abs(self.x - BLACKHOLE_X)**2) ** 0.5) / BLACKHOLE_Y))
@@ -116,6 +121,8 @@ class Blackhole(Player):
     it visible from the bottom of the screen.
     """
     def __init__(self, x: int, y: int, image: str) -> None:
+        # Redifine coords
+        x, y = SCREEN_WIDTH / 6, 550
         super().__init__(x, y, image)
         self.state = "blackhole"
         self.states = {"blackhole": pygame.image.load(image)}

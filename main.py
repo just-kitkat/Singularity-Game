@@ -87,7 +87,7 @@ def main():
         screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
         # Load images
-        background = pygame.image.load("assets/background.jpg").convert()
+        background = pygame.image.load(BACKGROUND_IMAGE).convert()
 
         num_planets = random.randint(8, 10)  # Random number of planets
         min_radius, max_radius = 80, 150  # Define min and max radius for planets
@@ -133,8 +133,8 @@ def main():
         # Main game
         player_time = 0
         while True:
-            game_state = update(dt, player, generated_planets, blackhole, planets_rect)
-            if game_state is not None: #player wins or lost
+            update(dt, player, generated_planets, blackhole, planets_rect)
+            if player.game_state != "playing": #player wins or lost
                 break
             player_time += draw(screen, player, background, objects, player_time)
             pygame.display.flip()
@@ -147,14 +147,32 @@ def main():
                 (0, 0)
             )
             screen.blit(
-                font.render('YOU LOST...', True, (255, 255, 255)), 
+                font.render('YOU LOST', True, (255, 255, 255)), 
                 (SCREEN_WIDTH / 2.8, SCREEN_HEIGHT / 3)
             )
             screen.blit(
                 font.render('PRESS ANY KEY TO GO BACK HOME', True, (255, 255, 255)), 
                 (SCREEN_WIDTH / 3.75, SCREEN_HEIGHT / 2)
             )
-            pygame.display.flip()
+        elif player.game_state == "won":
+            screen.blit(
+                pygame.image.load(BACKGROUND_IMAGE).convert(),
+                (0, 0)
+            )
+            screen.blit(
+                font.render('YOU WIN', True, (255, 255, 255)), 
+                (SCREEN_WIDTH / 2.8, SCREEN_HEIGHT / 3)
+            )
+            screen.blit(
+                font.render(f'TIME TAKEN: {player_time}', True, (255, 255, 255)), 
+                (SCREEN_WIDTH / 3.75, SCREEN_HEIGHT / 2)
+            )
+            screen.blit(
+                font.render('PRESS ANY KEY TO GO BACK HOME', True, (255, 255, 255)), 
+                (SCREEN_WIDTH / 3.75, SCREEN_HEIGHT / 1.4)
+            )
+        
+        pygame.display.flip()
         
         run_exit_screen = True
         while run_exit_screen:
