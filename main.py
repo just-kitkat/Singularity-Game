@@ -92,13 +92,13 @@ def main():
         num_planets = random.randint(8, 10)  # Random number of planets
         min_radius, max_radius = 80, 150  # Define min and max radius for planets
         generated_planets = generate_random_map(num_planets, min_radius, max_radius)
-        blackhole_coords = Blackhole(BLACKHOLE_X, BLACKHOLE_Y, image="circle.jpg") # Blackhole should be slightly below the visible screen
+        blackhole = Blackhole(BLACKHOLE_X, BLACKHOLE_Y, image="assets/blackhole.png") # Blackhole should be slightly below the visible screen
         planets_rect = [planet.image_rect for planet in generated_planets[0]]
         # index 0 is list of objects, index 1 is list of coordinates
 
         # Set up game objects
         player = Player(PLAYER_X, PLAYER_Y, image=IDLE)
-        objects = generated_planets[0] + [player]
+        objects = generated_planets[0] + [player] + [blackhole]
 
         # Game loop
         dt = 1 / FPS
@@ -133,7 +133,7 @@ def main():
         # Main game
         player_time = 0
         while True:
-            game_state = update(dt, player, generated_planets, blackhole_coords, planets_rect)
+            game_state = update(dt, player, generated_planets, blackhole, planets_rect)
             if game_state is not None: #player wins or lost
                 break
             player_time += draw(screen, player, background, objects, player_time)

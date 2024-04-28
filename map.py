@@ -35,7 +35,7 @@ def generate_random_map(num_planets, min_radius, max_radius):
         Create Planet objects from generated coordinates.
         """
         planet_coords = generate_non_colliding_coords()
-        return [Planet(x, y, "circle.jpg", radius) for x, y, radius in planet_coords], planet_coords
+        return [Planet(x, y, f"assets/planets/{random.randint(1,9)}.png", radius) for x, y, radius in planet_coords], planet_coords
 
     # Generate random map
     planets = create_planets()

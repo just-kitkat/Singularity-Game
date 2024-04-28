@@ -6,15 +6,15 @@ PLAYER_MOVEMENT_SHIFT = 2 # velocity of player
 INITIAL_GRAVITY = 1.4
 SCREEN_WIDTH, SCREEN_HEIGHT = 1366, 697
 PLAYER_X, PLAYER_Y = SCREEN_WIDTH / 2, 50
-BLACKHOLE_X, BLACKHOLE_Y = SCREEN_WIDTH / 2, SCREEN_HEIGHT + 20
+BLACKHOLE_X, BLACKHOLE_Y = SCREEN_WIDTH / 6, 550
 FPS = 30
 
 # Assets
 BACKGROUND_IMAGE = "background.jpg"
-IDLE = "assets/idle.png"
-FLY_UP = "assets/fly_up.png"
-FLY_LEFT = "assets/fly_left.png"
-FLY_RIGHT = "assets/fly_right.png"
+IDLE = "assets/player/idle.png"
+FLY_UP = "assets/player/fly_up.png"
+FLY_LEFT = "assets/player/fly_left.png"
+FLY_RIGHT = "assets/player/fly_right.png"
 ASTEROID = "assets/asteroid.png"
 
 
@@ -86,8 +86,8 @@ class Player:
 
         else:
             # Gravitate sideways towards the blackhole below
-            if blackhole.x > self.x: self.x += abs(self.x - BLACKHOLE_X) / abs(self.y - BLACKHOLE_Y)
-            elif blackhole.x < self.x: self.x -= abs(self.x - BLACKHOLE_X) / abs(self.y - BLACKHOLE_Y)
+            if blackhole.x > self.x: self.x += abs(self.x - BLACKHOLE_X) / max(0.01, abs(self.y - BLACKHOLE_Y))
+            elif blackhole.x < self.x: self.x -= abs(self.x - BLACKHOLE_X) / max(0.01, abs(self.y - BLACKHOLE_Y))
 
         # If player is able to move down (no planet or planet below)
         self.gravity = max(0.4, INITIAL_GRAVITY * (abs((abs(self.y - BLACKHOLE_Y)**2 + abs(self.x - BLACKHOLE_X)**2) ** 0.5) / BLACKHOLE_Y))
@@ -117,6 +117,11 @@ class Blackhole(Player):
     """
     def __init__(self, x: int, y: int, image: str) -> None:
         super().__init__(x, y, image)
+        self.state = "blackhole"
+        self.states = {"blackhole": pygame.image.load(image)}
+        self.states[self.state] = pygame.transform.scale(self.states[self.state], (1000, 400))
+        self.image = self.states["blackhole"]
+        self.image_rect = self.image.get_rect()
 
 
 class Planet(Player):
@@ -126,8 +131,11 @@ class Planet(Player):
     def __init__(self, x: int, y: int, image: str, radius: int) -> None:
         super().__init__(x, y, image)
         self.state = "planet"
-        self.states = {"planet": pygame.image.load("circle.jpg")}
-        self.states["planet"] = pygame.transform.scale(self.states["planet"], (30, 30))
+        self.states = {"planet": pygame.image.load(image)}
+        # self.states["planet"] = pygame.transform.scale(self.states["planet"], (30, 30))
+        n = 8 # scale factor for astronaut
+        for state in self.states:
+            self.states[state] = pygame.transform.scale(self.states[state], (self.states[state].get_width()/n, self.states[state].get_height()/n))
         self.image = self.states["planet"]
         self.image_rect = self.image.get_rect()
         self.radius = radius
