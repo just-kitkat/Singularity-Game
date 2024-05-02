@@ -5,6 +5,7 @@ from pygame.locals import *
 
 # Constants 
 from utils import (
+    blitlines,
     SCREEN_WIDTH, SCREEN_HEIGHT, 
     PLAYER_X, PLAYER_Y, 
     BLACKHOLE_X, BLACKHOLE_Y,
@@ -104,19 +105,28 @@ def main():
         dt = 1 / FPS
 
         # Home screen
-        font = pygame.font.Font("assets/font.ttf", 45)
-        screen.blit(
-            pygame.image.load(BACKGROUND_IMAGE).convert(),
-            (0, 0)
-        )
-        screen.blit(
-            font.render('SINGULARITY', True, (255, 255, 255)), 
-            (SCREEN_WIDTH / 2.8, SCREEN_HEIGHT / 3)
-        )
-        screen.blit(
-            font.render('PRESS ANY KEY TO START', True, (255, 255, 255)), 
-            (SCREEN_WIDTH / 3.75, SCREEN_HEIGHT / 2)
-        )
+        font_title = pygame.font.Font("assets/font.ttf", 40)
+        font_normal = pygame.font.SysFont("Comic Sans MS", 25)
+
+        screen.blit(pygame.image.load(BACKGROUND_IMAGE).convert(), (0, 0))
+        title = font_title.render("SINGULARITY X NYRCS", True, (255, 255, 255))
+        title_rect = title.get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3.5))
+        screen.blit(title, title_rect)
+
+        start_text = font_normal.render("Press any key to start", True, (255, 255, 255))
+        start_text_rect = start_text.get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2.6))
+        screen.blit(start_text, start_text_rect)
+
+        blitlines(
+            screen, 
+            """
+Questions:
+1. Why does time slow down?
+2. Why does the player turn red?""",
+            font_normal, 
+            (255, 255, 255), 
+            SCREEN_WIDTH / 2.8, SCREEN_HEIGHT / 2
+            )
         pygame.display.flip()
 
         run_start_screen = True
@@ -142,35 +152,30 @@ def main():
 
 
         if player.game_state == "lost":
-            screen.blit(
-                pygame.image.load(BACKGROUND_IMAGE).convert(),
-                (0, 0)
-            )
-            screen.blit(
-                font.render('YOU LOST', True, (255, 255, 255)), 
-                (SCREEN_WIDTH / 2.8, SCREEN_HEIGHT / 3)
-            )
-            screen.blit(
-                font.render('PRESS ANY KEY TO GO BACK HOME', True, (255, 255, 255)), 
-                (SCREEN_WIDTH / 3.75, SCREEN_HEIGHT / 2)
-            )
+            screen.blit(pygame.image.load(BACKGROUND_IMAGE).convert(), (0, 0))
+
+            start_text = font_normal.render("You lost...", True, (255, 255, 255))
+            start_text_rect = start_text.get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3.5))
+            screen.blit(start_text, start_text_rect)
+
+            start_text = font_normal.render("Press any key to go back home!", True, (255, 255, 255))
+            start_text_rect = start_text.get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2.5))
+            screen.blit(start_text, start_text_rect)
+
         elif player.game_state == "won":
-            screen.blit(
-                pygame.image.load(BACKGROUND_IMAGE).convert(),
-                (0, 0)
-            )
-            screen.blit(
-                font.render('YOU WIN', True, (255, 255, 255)), 
-                (SCREEN_WIDTH / 2.8, SCREEN_HEIGHT / 3)
-            )
-            screen.blit(
-                font.render(f'TIME TAKEN: {player_time}', True, (255, 255, 255)), 
-                (SCREEN_WIDTH / 3.75, SCREEN_HEIGHT / 2)
-            )
-            screen.blit(
-                font.render('PRESS ANY KEY TO GO BACK HOME', True, (255, 255, 255)), 
-                (SCREEN_WIDTH / 3.75, SCREEN_HEIGHT / 1.4)
-            )
+            screen.blit(pygame.image.load(BACKGROUND_IMAGE).convert(), (0, 0))
+
+            start_text = font_normal.render("YOU WIN", True, (255, 255, 255))
+            start_text_rect = start_text.get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4))
+            screen.blit(start_text, start_text_rect)
+
+            start_text = font_normal.render(f"Time taken: {round(player_time, 2)}s", True, (255, 255, 255))
+            start_text_rect = start_text.get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2.8))
+            screen.blit(start_text, start_text_rect)
+
+            start_text = font_normal.render("Press any key to go back home", True, (255, 255, 255))
+            start_text_rect = start_text.get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 1.8))
+            screen.blit(start_text, start_text_rect)
         
         pygame.display.flip()
         

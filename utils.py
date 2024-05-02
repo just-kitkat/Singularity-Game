@@ -18,6 +18,17 @@ FLY_RIGHT = "assets/player/fly_right.png"
 ASTEROID = "assets/asteroid.png"
 
 
+def blitlines(surf, text, renderer, color, x, y):
+    """
+    Renders multiple lines on the surface at once
+    """
+    h = renderer.get_height()
+    lines = text.split('\n')
+    for i, ll in enumerate(lines):
+        txt_surface = renderer.render(ll, True, color)
+        surf.blit(txt_surface, (x, y+(i*h*1.2)))
+
+
 class Player:
     def __init__(self, x: int, y: int, image: str) -> None:
         self.x = x
