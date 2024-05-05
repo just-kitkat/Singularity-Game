@@ -34,6 +34,7 @@ class Player:
         self.x = x
         self.y = y
         self.state = "idle"
+        self.id = "player"
         self.player_action = False
         # Load assets
         states = {
@@ -121,7 +122,13 @@ class Player:
         """
         Draws the player onto the screen
         """
-        self.image = self.states[self.state]
+        self.image = self.states[self.state].convert_alpha()
+        if self.id == "player":
+            print(255 * (BLACKHOLE_Y/(abs(self.y-BLACKHOLE_Y)+120) - 0.9))
+            self.image.fill(
+                (min(255, round(255 * (BLACKHOLE_Y/(abs(self.y-BLACKHOLE_Y)+120) - 0.9), 0)), 0, 0, 0),
+                special_flags=pygame.BLEND_ADD
+            )
         self.image_rect.x, self.image_rect.y = self.x, self.y
         screen.blit(self.image, self.image_rect)
 
@@ -136,6 +143,7 @@ class Blackhole(Player):
         x, y = SCREEN_WIDTH / 6, 550
         super().__init__(x, y, image)
         self.state = "blackhole"
+        self.id = "blackhole"
         self.states = {"blackhole": pygame.image.load(image)}
         self.states[self.state] = pygame.transform.scale(self.states[self.state], (1000, 400))
         self.image = self.states["blackhole"]
@@ -149,6 +157,7 @@ class Planet(Player):
     def __init__(self, x: int, y: int, image: str, radius: int) -> None:
         super().__init__(x, y, image)
         self.state = "planet"
+        self.id = "planet"
         self.states = {"planet": pygame.image.load(image)}
         # self.states["planet"] = pygame.transform.scale(self.states["planet"], (30, 30))
         n = 8 # scale factor for astronaut

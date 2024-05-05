@@ -127,6 +127,7 @@ Questions:
             (255, 255, 255), 
             SCREEN_WIDTH / 2.8, SCREEN_HEIGHT / 2
             )
+        
         pygame.display.flip()
 
         run_start_screen = True
