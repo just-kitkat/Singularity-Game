@@ -107,6 +107,7 @@ def main():
         # Home screen
         font_title = pygame.font.Font("assets/font.ttf", 40)
         font_normal = pygame.font.SysFont("Comic Sans MS", 25)
+        font_credits = pygame.font.SysFont("Comic Sans MS", 18)
 
         screen.blit(background, (0,0))
         title = font_title.render("SINGULARITY X NYRCS", True, (255, 255, 255))
@@ -126,6 +127,15 @@ Questions:
             font_normal, 
             (255, 255, 255), 
             SCREEN_WIDTH / 2.8, SCREEN_HEIGHT / 2
+            )
+        
+        blitlines(
+            screen, 
+            """Devs: E-Ket and Zhi Rui
+Artists: Ethan and Kia Leng""",
+            font_credits, 
+            (255, 255, 255), 
+            SCREEN_WIDTH / 1.22, SCREEN_HEIGHT / 1.1
             )
         
         pygame.display.flip()
