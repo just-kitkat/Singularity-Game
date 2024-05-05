@@ -29,7 +29,7 @@ def blitlines(surf, text, renderer, color, x, y):
         surf.blit(txt_surface, (x, y+(i*h*1.2)))
 
 
-class Player:
+class Player():
     def __init__(self, x: int, y: int, image: str) -> None:
         self.x = x
         self.y = y
@@ -47,7 +47,8 @@ class Player:
         for state in states:
             states[state] = pygame.transform.scale(states[state], (states[state].get_width()/n, states[state].get_height()/n))
         self.image = states["idle"]
-        self.image_rect = self.image.get_rect()
+        self.mask = pygame.mask.from_surface(self.image)
+        self.rect = self.image.get_rect()
         self.gravity = INITIAL_GRAVITY
         self.states = states
         self.game_state = "playing"
@@ -70,7 +71,7 @@ class Player:
             self.player_action = False
         
 
-    def float(self, planets: List[List[int]], blackhole, planets_rect) -> None:
+    def float(self, planets, blackhole) -> None:
         """
         Handles normal player movement
         planets -- [[x, y, radius], ...]
@@ -78,13 +79,13 @@ class Player:
 
         # Brute force nearest planet (if any)
         nearest_planet = None
-        for planet in planets[1]:
+        for planet in [(i.x, i.y, i.radius) for i in planets]:
             x, y, radius = planet
             if (abs(self.x - x)**2 + abs(self.y - y)**2)**0.5 < radius:
                 nearest_planet = planet
         
         # Check if player has reached blackhole
-        if self.y > BLACKHOLE_Y//2 and self.image_rect.colliderect(blackhole.image_rect):
+        if self.y > BLACKHOLE_Y//2 and pygame.sprite.collide_mask(self, blackhole):
             self.game_state = "won"
             return
 
@@ -92,8 +93,8 @@ class Player:
             p_X, _, _ = nearest_planet
 
             # Check for collision
-            for planet_rect in planets_rect:
-                if self.image_rect.colliderect(planet_rect):
+            for planet in planets:
+                if pygame.sprite.collide_mask(self, planet):
                     self.game_state = "lost"
                     return
 
@@ -129,8 +130,8 @@ class Player:
                 (min(255, round(255 * (BLACKHOLE_Y/(abs(self.y-BLACKHOLE_Y)+120) - 0.9), 0)), 0, 0, 0),
                 special_flags=pygame.BLEND_ADD
             )
-        self.image_rect.x, self.image_rect.y = self.x, self.y
-        screen.blit(self.image, self.image_rect)
+        self.rect.x, self.rect.y = self.x, self.y
+        screen.blit(self.image, self.rect)
 
 
 class Blackhole(Player):
@@ -147,7 +148,8 @@ class Blackhole(Player):
         self.states = {"blackhole": pygame.image.load(image)}
         self.states[self.state] = pygame.transform.scale(self.states[self.state], (1000, 400))
         self.image = self.states["blackhole"]
-        self.image_rect = self.image.get_rect()
+        self.mask = pygame.mask.from_surface(self.image)
+        self.rect = self.image.get_rect()
 
 
 class Planet(Player):
@@ -164,7 +166,8 @@ class Planet(Player):
         for state in self.states:
             self.states[state] = pygame.transform.scale(self.states[state], (self.states[state].get_width()/n, self.states[state].get_height()/n))
         self.image = self.states["planet"]
-        self.image_rect = self.image.get_rect()
+        self.rect = self.image.get_rect()
+        self.mask = pygame.mask.from_surface(self.image)
         self.radius = radius
 
     def draw(self, screen):

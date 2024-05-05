@@ -19,7 +19,7 @@ from utils import Player, Blackhole
 from map import generate_random_map
 
 
-def update(dt, player, planets, blackhole_coords, planets_rect):
+def update(dt, player, planets, blackhole_coords):
     """
     Update game. Called once per frame.
     dt is the amount of time passed since last frame.
@@ -30,7 +30,7 @@ def update(dt, player, planets, blackhole_coords, planets_rect):
 
     and this will scale your velocity based on time. Extend as necessary.
     """
-    player.float(planets, blackhole_coords, planets_rect)
+    player.float(planets, blackhole_coords)
 
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:
@@ -94,7 +94,7 @@ def main():
         min_radius, max_radius = 80, 150  # Define min and max radius for planets
         generated_planets = generate_random_map(num_planets, min_radius, max_radius)
         blackhole = Blackhole(BLACKHOLE_X, BLACKHOLE_Y, image="assets/blackhole.png") # Blackhole should be slightly below the visible screen
-        planets_rect = [planet.image_rect for planet in generated_planets[0]]
+        planets = generated_planets[0]
         # index 0 is list of objects, index 1 is list of coordinates
 
         # Set up game objects
@@ -144,7 +144,7 @@ Questions:
         # Main game
         player_time = 0
         while True:
-            update(dt, player, generated_planets, blackhole, planets_rect)
+            update(dt, player, planets, blackhole)
             if player.game_state != "playing": #player wins or lost
                 break
             player_time += draw(screen, player, background, objects, player_time)
