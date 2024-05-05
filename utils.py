@@ -4,9 +4,9 @@ import pygame
 # Constants
 PLAYER_MOVEMENT_SHIFT = 2 # velocity of player
 INITIAL_GRAVITY = 1.4
-SCREEN_WIDTH, SCREEN_HEIGHT = 1366, 697
+SCREEN_WIDTH, SCREEN_HEIGHT = 1366, 768
 PLAYER_X, PLAYER_Y = SCREEN_WIDTH / 2, 50
-BLACKHOLE_X, BLACKHOLE_Y = SCREEN_WIDTH / 2, SCREEN_HEIGHT + 20
+BLACKHOLE_X, BLACKHOLE_Y = SCREEN_WIDTH / 2, SCREEN_HEIGHT + 30
 FPS = 30
 
 # Assets
@@ -90,7 +90,7 @@ class Player():
             return
 
         if nearest_planet is not None: # Planet exists
-            p_X, _, _ = nearest_planet
+            p_X, p_Y, _ = nearest_planet
 
             # Check for collision
             for planet in planets:
@@ -99,8 +99,8 @@ class Player():
                     return
 
             # Move toward the planet (x-axis)
-            if p_X > self.x: self.x += 0.5
-            elif p_X < self.x: self.x -= 0.5
+            if p_X > self.x: self.x += abs(self.x - nearest_planet[0]) / abs(self.x - p_X)
+            elif p_X < self.x: self.x -= abs(self.x - nearest_planet[0]) / abs(self.x - p_X)
 
         else:
             # Gravitate sideways towards the blackhole below
@@ -113,10 +113,10 @@ class Player():
             self.y += self.gravity
             self.state = "idle"
         elif nearest_planet[1] > self.y:
-            self.y += abs(self.y - nearest_planet[1]) // abs(self.x - p_X)
-        elif self.x - p_X != 0: # check for division by 0
+            self.y += abs(self.y - nearest_planet[1]) / abs(self.y - p_Y)
+        else:
             # Move upwards to the planet slowly (proportional to dist from planet)
-            self.y -= abs(self.y - nearest_planet[1]) // abs(self.x - p_X)
+            self.y -= abs(self.y - nearest_planet[1]) / abs(self.y - p_Y)
 
     
     def draw(self, screen):
@@ -125,12 +125,12 @@ class Player():
         """
         self.image = self.states[self.state].convert_alpha()
         if self.id == "player":
-            print(255 * (BLACKHOLE_Y/(abs(self.y-BLACKHOLE_Y)+120) - 0.9))
             self.image.fill(
                 (min(255, round(255 * (BLACKHOLE_Y/(abs(self.y-BLACKHOLE_Y)+120) - 0.9), 0)), 0, 0, 0),
                 special_flags=pygame.BLEND_ADD
             )
-        self.rect.x, self.rect.y = self.x, self.y
+        image_size = self.image.get_size()
+        self.rect.x, self.rect.y = self.x - image_size[0]/2, self.y - image_size[1]/2
         screen.blit(self.image, self.rect)
 
 
@@ -141,7 +141,7 @@ class Blackhole(Player):
     """
     def __init__(self, x: int, y: int, image: str) -> None:
         # Redifine coords
-        x, y = SCREEN_WIDTH / 6, 550
+        x, y = BLACKHOLE_X, BLACKHOLE_Y
         super().__init__(x, y, image)
         self.state = "blackhole"
         self.id = "blackhole"
@@ -162,17 +162,27 @@ class Planet(Player):
         self.id = "planet"
         self.states = {"planet": pygame.image.load(image)}
         # self.states["planet"] = pygame.transform.scale(self.states["planet"], (30, 30))
-        n = 8 # scale factor for astronaut
+        scale = 5 # scale factor for astronaut
         for state in self.states:
-            self.states[state] = pygame.transform.scale(self.states[state], (self.states[state].get_width()/n, self.states[state].get_height()/n))
+            n = scale if image.split("/")[2][0] not in "678" else scale-2
+            add = (-1 if radius-100<0 else 1) * (((radius - 100)/5.5) ** 2)
+            self.states[state] = pygame.transform.scale(
+                self.states[state], 
+                (
+                    self.states[state].get_width()/n + add, 
+                    self.states[state].get_height()/n + add
+                )
+            )
         self.image = self.states["planet"]
         self.rect = self.image.get_rect()
         self.mask = pygame.mask.from_surface(self.image)
         self.radius = radius
 
     def draw(self, screen):
+        # Debug: display planet radius
+        # pygame.draw.circle(screen, (255, 0, 0), (self.x, self.y), self.radius, width=1)
+
         super().draw(screen)
-        # pygame.draw.circle(screen, (0, 255, 0), (self.x, self.y), self.radius)
 
     def get_coords_and_radius(self):
         """

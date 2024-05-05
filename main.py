@@ -16,7 +16,7 @@ from utils import (
 # Classes
 from utils import Player, Blackhole
 
-from map import generate_random_map
+from map import MAPS, parse_map, generate_random_map
 
 
 def update(dt, player, planets, blackhole_coords):
@@ -88,18 +88,18 @@ def main():
         screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
         # Load images
-        background = pygame.image.load(BACKGROUND_IMAGE).convert()
+        background = pygame.transform.scale(pygame.image.load(BACKGROUND_IMAGE).convert(), (SCREEN_WIDTH, SCREEN_HEIGHT))
 
         num_planets = random.randint(8, 10)  # Random number of planets
         min_radius, max_radius = 80, 150  # Define min and max radius for planets
-        generated_planets = generate_random_map(num_planets, min_radius, max_radius)
+        generated_planets = parse_map(MAPS[0])
         blackhole = Blackhole(BLACKHOLE_X, BLACKHOLE_Y, image="assets/blackhole.png") # Blackhole should be slightly below the visible screen
-        planets = generated_planets[0]
+        planets = generated_planets
         # index 0 is list of objects, index 1 is list of coordinates
 
         # Set up game objects
         player = Player(PLAYER_X, PLAYER_Y, image=IDLE)
-        objects = generated_planets[0] + [player] + [blackhole]
+        objects = generated_planets + [player] + [blackhole]
 
         # Game loop
         dt = 1 / FPS
@@ -108,7 +108,7 @@ def main():
         font_title = pygame.font.Font("assets/font.ttf", 40)
         font_normal = pygame.font.SysFont("Comic Sans MS", 25)
 
-        screen.blit(pygame.image.load(BACKGROUND_IMAGE).convert(), (0, 0))
+        screen.blit(background, (0,0))
         title = font_title.render("SINGULARITY X NYRCS", True, (255, 255, 255))
         title_rect = title.get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3.5))
         screen.blit(title, title_rect)
@@ -144,6 +144,12 @@ Questions:
         # Main game
         player_time = 0
         while True:
+            for event in pygame.event.get():
+                if event.type == pygame.MOUSEBUTTONUP:
+                    print(f"DEBUG: Mouse position: {pygame.mouse.get_pos()}")
+                elif event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
             update(dt, player, planets, blackhole)
             if player.game_state != "playing": #player wins or lost
                 break
@@ -153,7 +159,7 @@ Questions:
 
 
         if player.game_state == "lost":
-            screen.blit(pygame.image.load(BACKGROUND_IMAGE).convert(), (0, 0))
+            screen.blit(background, (0, 0))
 
             start_text = font_normal.render("You lost...", True, (255, 255, 255))
             start_text_rect = start_text.get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3.5))
@@ -164,7 +170,7 @@ Questions:
             screen.blit(start_text, start_text_rect)
 
         elif player.game_state == "won":
-            screen.blit(pygame.image.load(BACKGROUND_IMAGE).convert(), (0, 0))
+            screen.blit(background.convert(), (0, 0))
 
             start_text = font_normal.render("YOU WIN", True, (255, 255, 255))
             start_text_rect = start_text.get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4))
