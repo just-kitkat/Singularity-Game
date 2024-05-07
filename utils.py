@@ -119,12 +119,12 @@ class Player():
             self.y -= abs(self.y - nearest_planet[1]) / abs(self.y - p_Y)
 
     
-    def draw(self, screen):
+    def draw(self, screen, redshift=True):
         """
         Draws the player onto the screen
         """
         self.image = self.states[self.state].convert_alpha()
-        if self.id == "player":
+        if self.id == "player" and redshift:
             self.image.fill(
                 (min(255, round(255 * (BLACKHOLE_Y/(abs(self.y-BLACKHOLE_Y)+120) - 0.9), 0)), 0, 0, 0),
                 special_flags=pygame.BLEND_ADD

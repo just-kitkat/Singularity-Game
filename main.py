@@ -109,38 +109,10 @@ def main():
         font_normal = pygame.font.SysFont("Comic Sans MS", 25)
         font_credits = pygame.font.SysFont("Comic Sans MS", 18)
 
-        screen.blit(background, (0,0))
-        title = font_title.render("SINGULARITY X NYRCS", True, (255, 255, 255))
-        title_rect = title.get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3.5))
-        screen.blit(title, title_rect)
-
-        start_text = font_normal.render("Press any key to start", True, (255, 255, 255))
-        start_text_rect = start_text.get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2.6))
-        screen.blit(start_text, start_text_rect)
-
-        blitlines(
-            screen, 
-            """
-Questions:
-1. Why does time slow down?
-2. Why does the player turn red?""",
-            font_normal, 
-            (255, 255, 255), 
-            SCREEN_WIDTH / 2.8, SCREEN_HEIGHT / 2
-            )
         
-        blitlines(
-            screen, 
-            """Devs: E-Ket and Zhi Rui
-Artists: Ethan and Kia Leng""",
-            font_credits, 
-            (255, 255, 255), 
-            SCREEN_WIDTH / 1.22, SCREEN_HEIGHT / 1.1
-            )
-        
-        pygame.display.flip()
 
         run_start_screen = True
+        floater = Player(10, 200, IDLE)
         while run_start_screen:
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
@@ -148,6 +120,42 @@ Artists: Ethan and Kia Leng""",
                 elif event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
+            
+            screen.blit(background, (0,0))
+            title = font_title.render("SINGULARITY X NYRCS", True, (255, 255, 255))
+            title_rect = title.get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3.5))
+            screen.blit(title, title_rect)
+
+            start_text = font_normal.render("Press any key to start", True, (255, 255, 255))
+            start_text_rect = start_text.get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2.6))
+            screen.blit(start_text, start_text_rect)
+
+            blitlines(
+                screen, 
+                """
+Questions:
+1. Why does time slow down?
+2. Why does the player turn red?""",
+                font_normal, 
+                (255, 255, 255), 
+                SCREEN_WIDTH / 2.8, SCREEN_HEIGHT / 2
+                )
+            
+            blitlines(
+                screen, 
+                """Devs: E-Ket and Zhi Rui
+Artists: Ethan and Kia Leng""",
+                font_credits, 
+                (255, 255, 255), 
+                SCREEN_WIDTH / 1.22, SCREEN_HEIGHT / 1.1
+                )
+            
+            # center = floater.x-floater.image.get_size()[0]/2, floater.y-floater.image.get_size()[1]/2
+            # floater.states["idle"] = pygame.transform.rotate(floater.states["idle"], 2)
+            # floater.rect = floater.states["idle"].get_rect(center=floater.rect.center)
+            # screen.blit(floater.states["idle"], floater.rect)
+            # floater.draw(screen, redshift=False)
+            pygame.display.flip()
 
             dt = clock.tick(FPS)
 
