@@ -19,6 +19,9 @@ from utils import Player, Blackhole
 from map import MAPS, parse_map, generate_random_map
 
 
+debug_mode = False # press "p" key in-game to toggle. when enabled, radius of planets will be displayed
+
+
 def update(dt, player, planets, blackhole_coords):
     """
     Update game. Called once per frame.
@@ -37,6 +40,8 @@ def update(dt, player, planets, blackhole_coords):
         player.move("left")
     elif keys[pygame.K_RIGHT]:
         player.move("right")
+    elif keys[pygame.K_UP]:
+        player.move("up")
     else:
         player.move("idle")
 
@@ -72,7 +77,7 @@ round(distance_from_blackhole, 2)
             (5, 40)
         )
     for obj in objects:
-        obj.draw(screen)
+        obj.draw(screen, debug_mode=debug_mode)
     
     # return change in time (depending on blackhole distance)
     return 1/FPS * min(1, (player.gravity ** 4))#((distance_from_blackhole**2)/(10000**2))
@@ -92,7 +97,7 @@ def main():
 
         num_planets = random.randint(8, 10)  # Random number of planets
         min_radius, max_radius = 80, 150  # Define min and max radius for planets
-        generated_planets = parse_map(MAPS[0])
+        generated_planets = parse_map(random.choice(MAPS))
         blackhole = Blackhole(BLACKHOLE_X, BLACKHOLE_Y, image="assets/blackhole.png") # Blackhole should be slightly below the visible screen
         planets = generated_planets
         # index 0 is list of objects, index 1 is list of coordinates
@@ -165,13 +170,20 @@ Artists: Ethan and Kia Leng""",
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONUP:
                     print(f"DEBUG: Mouse position: {pygame.mouse.get_pos()}")
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_p:
+                    print(f"DEBUG MODE TOGGLED")
+                    global debug_mode
+                    debug_mode = not debug_mode
                 elif event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-            update(dt, player, planets, blackhole)
-            if player.game_state != "playing": #player wins or lost
-                break
-            player_time += draw(screen, player, background, objects, player_time)
+            try:
+                update(dt, player, planets, blackhole)
+                if player.game_state != "playing": #player wins or lost
+                    break
+                player_time += draw(screen, player, background, objects, player_time)
+            except Exception:
+                pass
             pygame.display.flip()
             dt = clock.tick(FPS)
 

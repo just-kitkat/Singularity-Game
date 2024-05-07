@@ -3,6 +3,7 @@ import pygame
 
 # Constants
 PLAYER_MOVEMENT_SHIFT = 2 # velocity of player
+PLAYER_UP_SHIFT = 2
 INITIAL_GRAVITY = 1.4
 SCREEN_WIDTH, SCREEN_HEIGHT = 1366, 768
 PLAYER_X, PLAYER_Y = SCREEN_WIDTH / 2, 50
@@ -66,6 +67,10 @@ class Player():
             self.x += PLAYER_MOVEMENT_SHIFT
             self.state = "fly_right"
             self.player_action = True
+        elif dir == "up":
+            self.y -= PLAYER_UP_SHIFT
+            self.state = "fly_up"
+            self.player_action = True
         else:
             self.state = "idle"
             self.player_action = False
@@ -99,8 +104,9 @@ class Player():
                     return
 
             # Move toward the planet (x-axis)
-            if p_X > self.x: self.x += abs(self.x - nearest_planet[0]) / abs(self.x - p_X)
-            elif p_X < self.x: self.x -= abs(self.x - nearest_planet[0]) / abs(self.x - p_X)
+            if self.state != "fly_up":
+                if p_X > self.x: self.x += abs(self.x - nearest_planet[0]) / abs(self.x - p_X)
+                elif p_X < self.x: self.x -= abs(self.x - nearest_planet[0]) / abs(self.x - p_X)
 
         else:
             # Gravitate sideways towards the blackhole below
@@ -119,7 +125,7 @@ class Player():
             self.y -= abs(self.y - nearest_planet[1]) / abs(self.y - p_Y)
 
     
-    def draw(self, screen, redshift=True):
+    def draw(self, screen, redshift=True, **kwargs):
         """
         Draws the player onto the screen
         """
@@ -178,9 +184,9 @@ class Planet(Player):
         self.mask = pygame.mask.from_surface(self.image)
         self.radius = radius
 
-    def draw(self, screen):
+    def draw(self, screen, debug_mode=False):
         # Debug: display planet radius
-        # pygame.draw.circle(screen, (255, 0, 0), (self.x, self.y), self.radius, width=1)
+        if debug_mode: pygame.draw.circle(screen, (255, 0, 0), (self.x, self.y), self.radius, width=1)
 
         super().draw(screen)
 
