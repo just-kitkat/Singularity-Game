@@ -67,14 +67,14 @@ def draw(screen, player, background, objects, player_time):
         )
     screen.blit(
             font.render(f'Time elapsed: {round(player_time, 1)}s', True, (255, 255, 255)), 
-            (5, 5)
+            (20, 20)
         )
     screen.blit(
             font.render(f"""Distance from blackhole {
 round(distance_from_blackhole, 2)
 }km""", True, (255, 255, 255)
 ), 
-            (5, 40)
+            (20, 50)
         )
     for obj in objects:
         obj.draw(screen, debug_mode=debug_mode)
@@ -112,9 +112,11 @@ def main():
         # Home screen
         font_title = pygame.font.Font("assets/font.ttf", 40)
         font_normal = pygame.font.SysFont("Comic Sans MS", 25)
-        font_credits = pygame.font.SysFont("Comic Sans MS", 18)
+        font_small = pygame.font.SysFont("Comic Sans MS", 18)
 
-        
+        # Get highscore
+        with open("highscore.txt", "r") as f:
+            highscore = float(f.readline())        
 
         run_start_screen = True
         floater = Player(10, 200, IDLE)
@@ -135,6 +137,9 @@ def main():
             start_text_rect = start_text.get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2.6))
             screen.blit(start_text, start_text_rect)
 
+            start_text = font_small.render(f"Highscore: {highscore}s", True, (255, 255, 255))
+            screen.blit(start_text, (20, 20))
+
             blitlines(
                 screen, 
                 """
@@ -150,7 +155,7 @@ Questions:
                 screen, 
                 """Devs: E-Ket and Zhi Rui
 Artists: Ethan and Kia Leng""",
-                font_credits, 
+                font_small, 
                 (255, 255, 255), 
                 SCREEN_WIDTH / 1.22, SCREEN_HEIGHT / 1.1
                 )
@@ -200,13 +205,20 @@ Artists: Ethan and Kia Leng""",
             screen.blit(start_text, start_text_rect)
 
         elif player.game_state == "won":
+            player_time = round(player_time, 1)
+
+            # Update highscore
+            if player_time < highscore:
+                with open("highscore.txt", "w") as f:
+                    f.write(str(player_time))
+
             screen.blit(background.convert(), (0, 0))
 
             start_text = font_normal.render("YOU WIN", True, (255, 255, 255))
             start_text_rect = start_text.get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4))
             screen.blit(start_text, start_text_rect)
 
-            start_text = font_normal.render(f"Time taken: {round(player_time, 2)}s", True, (255, 255, 255))
+            start_text = font_normal.render(f"Time taken: {player_time}s", True, (255, 255, 255))
             start_text_rect = start_text.get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2.8))
             screen.blit(start_text, start_text_rect)
 
